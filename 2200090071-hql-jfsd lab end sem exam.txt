@@ -1,0 +1,102 @@
+
+
+create entity class
+--------------------------
+
+package com.klef.jfsd.exam;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name = "department")
+public class Department {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "location")
+    private String location;
+
+    @Column(name = "hod_name")
+    private String hodName;
+
+  
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+    public String getHodName() { return hodName; }
+    public void setHodName(String hodName) { this.hodName = hodName; }
+}
+
+create a class client Demo
+----------------------------
+package com.klef.jfsd.exam;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
+public class ClientDemo {
+    public static void main(String[] args) {
+        SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").addAnnotatedClass(Department.class).buildSessionFactory();
+
+        try (Session session = factory.openSession()) {
+            Transaction tx = session.beginTransaction();
+
+            // HQL Update Query using positional parameters
+            String hql = "UPDATE Department SET name = ?1, location = ?2 WHERE id = ?3";
+            Query query = session.createQuery(hql);
+            query.setParameter(1, "Updated Department Name");
+            query.setParameter(2, "Updated Location");
+            query.setParameter(3, 1); // Department ID to update
+
+            int result = query.executeUpdate();
+            System.out.println(result + " record(s) updated.");
+
+            tx.commit();
+        } finally {
+            factory.close();
+        }
+    }
+}
+
+Hibernate configuration 
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/labexam</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">chinni1317</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        <property name="hibernate.show_sql">true</property>
+    </session-factory>
+</hibernate-configuration>
+
+
+output
++----+----------------------+------------------+----------+
+| id | name                 | location         | hod_name |
++----+----------------------+------------------+----------+
+| 1  | Computer Science     | Building A       | Alice    |
++----+----------------------+------------------+----------+
+
+
+
++----+----------------------+------------------+----------+
+| id | name                 | location         | hod_name |
++----+----------------------+------------------+----------+
+| 1  | Updated Name         | Updated Location | Alice    |
++----+----------------------+------------------+----------+
+
+
+
+
